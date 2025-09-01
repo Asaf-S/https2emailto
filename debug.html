@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debugging Tools</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2em;
+        line-height: 1.6;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      p {
+        margin-top: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Debugging Tools</h1>
+    <button id="debug-toggle">Toggle Debug Mode</button>
+    <p>Current debug mode status: <strong id="debug-status"></strong></p>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const debugToggle = document.getElementById("debug-toggle");
+        const debugStatus = document.getElementById("debug-status");
+
+        function updateStatus() {
+          const isDebug = localStorage.getItem("debug-no-redirect") === "true";
+          debugStatus.textContent = isDebug ? "ON (Redirect disabled)" : "OFF (Redirect enabled)";
+        }
+
+        debugToggle.addEventListener("click", function () {
+          const isDebug = localStorage.getItem("debug-no-redirect") === "true";
+          localStorage.setItem("debug-no-redirect", !isDebug);
+          updateStatus();
+        });
+
+        // Initial status
+        updateStatus();
+      });
+    </script>
+  </body>
+</html>

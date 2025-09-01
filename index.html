@@ -24,6 +24,22 @@
     <h1>Preparing your email...</h1>
     <p>If you are not redirected automatically, <a id="mailto-link" href="#">click here to open your email client</a>.</p>
 
+    <div id="no-handler-message" style="display: none">
+      <h2>Could not open your email client</h2>
+      <p>
+        It seems you may not have a default email client configured on your device. You can manually compose the email using the
+        details below:
+      </p>
+      <div style="margin-top: 1.5em">
+        <strong>To:</strong> <code id="manual-to"></code><br />
+        <span id="manual-cc-container" style="display: none"><strong>Cc:</strong> <code id="manual-cc"></code><br /></span>
+        <span id="manual-bcc-container" style="display: none"><strong>Bcc:</strong> <code id="manual-bcc"></code><br /></span>
+        <strong>Subject:</strong> <code id="manual-subject"></code><br />
+        <strong>Body:</strong>
+        <pre><code id="manual-body"></code></pre>
+      </div>
+    </div>
+
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         try {
@@ -32,11 +48,29 @@
           let mailtoLink = "mailto:";
 
           const mailtoParams = new URLSearchParams();
-          if (urlParams.has("to")) mailtoParams.set("to", urlParams.get("to"));
-          if (urlParams.has("subject")) mailtoParams.set("subject", urlParams.get("subject"));
-          if (urlParams.has("body")) mailtoParams.set("body", urlParams.get("body"));
-          if (urlParams.has("cc")) mailtoParams.set("cc", urlParams.get("cc"));
-          if (urlParams.has("bcc")) mailtoParams.set("bcc", urlParams.get("bcc"));
+          const to = urlParams.get("to");
+          const subject = urlParams.get("subject");
+          const body = urlParams.get("body");
+          const cc = urlParams.get("cc");
+          const bcc = urlParams.get("bcc");
+
+          if (to) mailtoParams.set("to", to);
+          if (subject) mailtoParams.set("subject", subject);
+          if (body) mailtoParams.set("body", body);
+          if (cc) {
+            mailtoParams.set("cc", cc);
+            document.getElementById("manual-cc").textContent = cc;
+            document.getElementById("manual-cc-container").style.display = "inline";
+          }
+          if (bcc) {
+            mailtoParams.set("bcc", bcc);
+            document.getElementById("manual-bcc").textContent = bcc;
+            document.getElementById("manual-bcc-container").style.display = "inline";
+          }
+
+          document.getElementById("manual-to").textContent = to || "";
+          document.getElementById("manual-subject").textContent = subject || "";
+          document.getElementById("manual-body").textContent = body || "";
 
           const mailtoParamsString = mailtoParams.toString();
           if (mailtoParamsString) {
@@ -54,7 +88,18 @@
           }
 
           // Redirect
-          window.location.href = mailtoLink;
+          if (localStorage.getItem("debug-no-redirect") !== "true") {
+            window.location.href = mailtoLink;
+          }
+
+          setTimeout(function () {
+            if (document.visibilityState === "visible") {
+              // If the page is still visible after a delay, it's likely no mail handler was found.
+              document.querySelector("h1").style.display = "none";
+              document.querySelector("p").style.display = "none";
+              document.getElementById("no-handler-message").style.display = "block";
+            }
+          }, 2000);
         } catch (e) {
           document.body.innerHTML = "<h1>Error</h1><p>An unexpected error occurred while generating the email link.</p>";
           console.error(e);

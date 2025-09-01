@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redirecting to Email</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2em;
+        line-height: 1.6;
+      }
+      code {
+        background-color: #f4f4f4;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+      a {
+        color: #007bff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Preparing your email...</h1>
+    <p>If you are not redirected automatically, <a id="mailto-link" href="#">click here to open your email client</a>.</p>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+
+          let mailtoLink = "mailto:";
+
+          const mailtoParams = new URLSearchParams();
+          if (urlParams.has("to")) mailtoParams.set("to", urlParams.get("to"));
+          if (urlParams.has("subject")) mailtoParams.set("subject", urlParams.get("subject"));
+          if (urlParams.has("body")) mailtoParams.set("body", urlParams.get("body"));
+          if (urlParams.has("cc")) mailtoParams.set("cc", urlParams.get("cc"));
+          if (urlParams.has("bcc")) mailtoParams.set("bcc", urlParams.get("bcc"));
+
+          const mailtoParamsString = mailtoParams.toString();
+          if (mailtoParamsString) {
+            mailtoLink += `?${mailtoParamsString}`;
+          }
+
+          const mailtoLinkElement = document.getElementById("mailto-link");
+          if (mailtoLinkElement) {
+            mailtoLinkElement.href = mailtoLink;
+          }
+
+          const headingElement = document.querySelector("h1");
+          if (headingElement) {
+            headingElement.textContent = "Redirecting you to your email client...";
+          }
+
+          // Redirect
+          window.location.href = mailtoLink;
+        } catch (e) {
+          document.body.innerHTML = "<h1>Error</h1><p>An unexpected error occurred while generating the email link.</p>";
+          console.error(e);
+        }
+      });
+    </script>
+  </body>
+</html>

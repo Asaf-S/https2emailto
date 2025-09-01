@@ -10,7 +10,8 @@
         padding: 2em;
         line-height: 1.6;
       }
-      button {
+      button,
+      select {
         padding: 10px 20px;
         font-size: 16px;
         cursor: pointer;
@@ -24,6 +25,15 @@
     <h1>Debugging Tools</h1>
     <button id="debug-toggle">Toggle Debug Mode</button>
     <p>Current debug mode status: <strong id="debug-status"></strong></p>
+
+    <h2>Language Override</h2>
+    <label for="lang-picker">Select language:</label>
+    <select id="lang-picker">
+      <option value="">None selected</option>
+      <option value="en">en</option>
+      <option value="he">he</option>
+    </select>
+    <p>Current language override: <strong id="lang-status"></strong></p>
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
@@ -43,6 +53,28 @@
 
         // Initial status
         updateStatus();
+
+        const langPicker = document.getElementById("lang-picker");
+        const langStatus = document.getElementById("lang-status");
+
+        function updateLangStatus() {
+          const lang = localStorage.getItem("debug-lang");
+          langStatus.textContent = lang || "None";
+          langPicker.value = lang || "";
+        }
+
+        langPicker.addEventListener("change", function () {
+          const selectedLang = langPicker.value;
+          if (selectedLang) {
+            localStorage.setItem("debug-lang", selectedLang);
+          } else {
+            localStorage.removeItem("debug-lang");
+          }
+          updateLangStatus();
+        });
+
+        // Initial lang status
+        updateLangStatus();
       });
     </script>
   </body>

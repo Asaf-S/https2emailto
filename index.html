@@ -3,7 +3,43 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Redirecting to Email</title>
+    <title></title>
+    <script>
+      const strings = {
+        en: {
+          documentTitle: "Redirecting to Email...",
+          mainHeading: "Preparing your email...",
+          redirectMessage:
+            'If you are not redirected automatically, <a id="mailto-link" href="#">click here to open your email client</a>.',
+          noHandlerHeading: "Could not open your email client",
+          noHandlerMessage:
+            "It seems you may not have a default email client configured on your device. You can manually compose the email using the details below:",
+          toLabel: "To:",
+          ccLabel: "Cc:",
+          bccLabel: "Bcc:",
+          subjectLabel: "Subject:",
+          bodyLabel: "Body:",
+          errorHeading: "Error",
+          errorMessage: "An unexpected error occurred while generating the email link.",
+        },
+        he: {
+          // spell-checker: disable
+          documentTitle: "מפנה למייל...",
+          mainHeading: "מכין את המייל שלך...",
+          redirectMessage: 'אם ההפניה האוטומטית לא עובדת, <a id="mailto-link-he" href="#">לחץ כאן לפתיחת תוכנת המייל</a>.',
+          noHandlerHeading: "לא ניתן לפתוח את תוכנת המייל",
+          noHandlerMessage: "נראה שאין לך תוכנת מייל מוגדרת במכשיר. תוכל לכתוב את המייל באופן ידני עם הפרטים הבאים:",
+          toLabel: "אל:",
+          ccLabel: "עותק:",
+          bccLabel: "עותק נסתר:",
+          subjectLabel: "נושא:",
+          bodyLabel: "גוף ההודעה:",
+          errorHeading: "שגיאה",
+          errorMessage: "אירעה שגיאה בלתי צפויה בעת יצירת קישור המייל.",
+          // spell-checker: enable
+        },
+      };
+    </script>
     <style>
       body {
         font-family: sans-serif;
@@ -21,27 +57,48 @@
     </style>
   </head>
   <body>
-    <h1>Preparing your email...</h1>
-    <p>If you are not redirected automatically, <a id="mailto-link" href="#">click here to open your email client</a>.</p>
+    <h1></h1>
+    <p></p>
 
     <div id="no-handler-message" style="display: none">
-      <h2>Could not open your email client</h2>
-      <p>
-        It seems you may not have a default email client configured on your device. You can manually compose the email using the
-        details below:
-      </p>
+      <h2></h2>
+      <p></p>
       <div style="margin-top: 1.5em">
-        <strong>To:</strong> <code id="manual-to"></code><br />
-        <span id="manual-cc-container" style="display: none"><strong>Cc:</strong> <code id="manual-cc"></code><br /></span>
-        <span id="manual-bcc-container" style="display: none"><strong>Bcc:</strong> <code id="manual-bcc"></code><br /></span>
-        <strong>Subject:</strong> <code id="manual-subject"></code><br />
-        <strong>Body:</strong>
+        <strong data-key="toLabel"></strong> <code id="manual-to"></code><br />
+        <span id="manual-cc-container" style="display: none"
+          ><strong data-key="ccLabel"></strong> <code id="manual-cc"></code><br
+        /></span>
+        <span id="manual-bcc-container" style="display: none"
+          ><strong data-key="bccLabel"></strong> <code id="manual-bcc"></code><br
+        /></span>
+        <strong data-key="subjectLabel"></strong> <code id="manual-subject"></code><br />
+        <strong data-key="bodyLabel"></strong>
         <pre><code id="manual-body"></code></pre>
       </div>
     </div>
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
+        const lang = navigator.language.split("-")[0] === "he" || localStorage.getItem("debug-lang") === "he" ? "he" : "en";
+        const s = strings[lang];
+
+        if (lang === "he") {
+          document.documentElement.lang = "he";
+          document.documentElement.dir = "rtl";
+        }
+
+        document.title = s.documentTitle;
+        document.querySelector("h1").textContent = s.mainHeading;
+        document.querySelector("p").innerHTML = s.redirectMessage;
+        document.querySelector("h2").textContent = s.noHandlerHeading;
+        document.querySelector("#no-handler-message p").textContent = s.noHandlerMessage;
+
+        document.querySelector('[data-key="toLabel"]').textContent = s.toLabel;
+        document.querySelector('[data-key="ccLabel"]').textContent = s.ccLabel;
+        document.querySelector('[data-key="bccLabel"]').textContent = s.bccLabel;
+        document.querySelector('[data-key="subjectLabel"]').textContent = s.subjectLabel;
+        document.querySelector('[data-key="bodyLabel"]').textContent = s.bodyLabel;
+
         try {
           const urlParams = new URLSearchParams(window.location.search);
 
@@ -82,10 +139,7 @@
             mailtoLinkElement.href = mailtoLink;
           }
 
-          const headingElement = document.querySelector("h1");
-          if (headingElement) {
-            headingElement.textContent = "Redirecting you to your email client...";
-          }
+          // The heading element is already updated above.
 
           // Redirect
           if (localStorage.getItem("debug-no-redirect") !== "true") {
@@ -101,7 +155,7 @@
             }
           }, 2000);
         } catch (e) {
-          document.body.innerHTML = "<h1>Error</h1><p>An unexpected error occurred while generating the email link.</p>";
+          document.body.innerHTML = "<h1>" + s.errorHeading + "</h1><p>" + s.errorMessage + "</p>";
           console.error(e);
         }
       });
